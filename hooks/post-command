@@ -24,5 +24,5 @@ fi
 
 KEY=$(build_key "${LEVEL}" "${CACHE_PATH}")
 
-echo "Saving ${LEVEL}-level cache of ${CACHE_PATH}"
+echo "Saving ${LEVEL}-level cache of ${CACHE_PATH} using key ${KEY}"
 backend_exec save "${KEY}" "${CACHE_PATH}"
