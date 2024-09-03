@@ -13,7 +13,7 @@ steps:
   - label: ':nodejs: Install dependencies'
     command: npm ci
     plugins:
-      - cache#v0.3.2:
+      - opzkit/cache#v2:
           manifest: package-lock.json
           path: node_modules
           restore: file
@@ -122,7 +122,7 @@ steps:
   - label: ':nodejs: Install dependencies'
     command: npm ci
     plugins:
-      - cache#v0.3.2:
+      - opzkit/cache#v2:
           manifest: package-lock.json
           path: node_modules
           restore: pipeline
@@ -131,7 +131,7 @@ steps:
   - label: ':test_tube: Run tests'
     command: npm test # does not save cache, not necessary
     plugins:
-      - cache#v0.3.2:
+      - opzkit/cache#v2:
           manifest: package-lock.json
           path: node_modules
           restore: file
@@ -140,7 +140,7 @@ steps:
     if: build.branch == "master"
     command: npm run deploy
     plugins:
-      - cache#v0.3.2:
+      - opzkit/cache#v2:
           manifest: package-lock.json
           path: node_modules
           restore: file
