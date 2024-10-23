@@ -27,6 +27,9 @@ setup() {
   export BUILDKITE_PIPELINE_SLUG="cache-pipeline"
 
   # stubs are the same for every test
+  stub tar \
+    "\* \* \* : echo compressed \$2 into \$3 with options \$1"
+
   stub cache_dummy \
     "save \* \* : echo saving \$3 in \$2"
 }
@@ -42,21 +45,16 @@ teardown() {
   export BUILDKITE_PLUGIN_CACHE_SAVE=file
   export BUILDKITE_PLUGIN_CACHE_MANIFEST=tests/data/my_files/llamas.txt
 
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
-
   run "$PWD/hooks/post-command"
 
   assert_success
   assert_output --partial 'Saving file-level cache'
   assert_output --partial 'Compressing tests/data/my_files with tgz'
+  assert_output --partial "with options czf"
 }
 
 @test "Step-level saving" {
   export BUILDKITE_PLUGIN_CACHE_SAVE=step
-
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
 
   run "$PWD/hooks/post-command"
 
@@ -68,9 +66,6 @@ teardown() {
 @test "Branch-level saving" {
   export BUILDKITE_PLUGIN_CACHE_SAVE=branch
 
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
-
   run "$PWD/hooks/post-command"
 
   assert_success
@@ -81,9 +76,6 @@ teardown() {
 @test "Pipeline-level saving" {
   export BUILDKITE_PLUGIN_CACHE_SAVE=pipeline
 
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
-
   run "$PWD/hooks/post-command"
 
   assert_success
@@ -93,9 +85,6 @@ teardown() {
 
 @test "All-level saving" {
   export BUILDKITE_PLUGIN_CACHE_SAVE=all
-
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
 
   run "$PWD/hooks/post-command"
 
@@ -112,9 +101,6 @@ teardown() {
   stub cache_dummy \
     "save \* \* : echo saving \$3 in \$2"
 
-  stub tar \
-    "czf \* \* : echo compressed \$2 into \$3"
-
   run "$PWD/hooks/post-command"
 
   assert_success
@@ -124,16 +110,14 @@ teardown() {
 
 
 @test 'Pipeline-level saving with absolute cache path' {
-  export BUILDKITE_PLUGIN_CACHE_PATH=/tmp/tests/data/my_files
-
-  stub tar \
-    "czPf \* \* : echo compressed \$2 into \$3"
-
+  BUILDKITE_PLUGIN_CACHE_PATH="$(mktemp -d)"
+  export BUILDKITE_PLUGIN_CACHE_PATH
   export BUILDKITE_PLUGIN_CACHE_SAVE=pipeline
 
   run "$PWD/hooks/post-command"
 
   assert_success
   assert_output --partial 'Saving pipeline-level cache'
-  assert_output --partial 'Compressing /tmp/tests/data/my_files with tgz...'
+  assert_output --partial "Compressing ${BUILDKITE_PLUGIN_CACHE_PATH} with tgz..."
+  assert_output --partial "with options czPf"
 }
