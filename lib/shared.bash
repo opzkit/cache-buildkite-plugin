@@ -58,7 +58,7 @@ build_key() {
 
 backend_exec() {
   local BACKEND_NAME
-  BACKEND_NAME=$(plugin_read_config BACKEND 'fs')
+  BACKEND_NAME="tar_s3"
 
   PATH="${PATH}:${DIR}/../backends" "cache_${BACKEND_NAME}" "$@"
 }
